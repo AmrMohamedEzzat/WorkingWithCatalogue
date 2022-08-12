@@ -1,6 +1,7 @@
 <?php
 
 namespace Scandiweb\Test\Setup\Patch\Data;
+
 /* importing required classes  */
 use Magento\Catalog\Api\Data\ProductInterfaceFactory;
 use Magento\Catalog\Api\ProductRepositoryInterface;
@@ -16,49 +17,87 @@ use Magento\InventoryApi\Api\Data\SourceItemInterfaceFactory;
 use Magento\InventoryApi\Api\SourceItemsSaveInterface;
 use Magento\Catalog\Api\CategoryLinkManagementInterface;
 
-class AddNewProduct implements DataPatchInterface {
+class AddNewProduct implements DataPatchInterface
+{
     /* initializing variables needed*/
+    /**
+     * @var ProductInterfaceFactory
+     */
     protected ProductInterfaceFactory $productInterfaceFactory;
-
+    /**
+     * @var ProductRepositoryInterface
+     */
     protected ProductRepositoryInterface $productRepository;
-
+    /**
+     * @var State
+     */
     protected State $appState;
-
-	protected EavSetup $eavSetup;
-
-	protected SourceItemInterfaceFactory $sourceItemFactory;
-
-	protected SourceItemsSaveInterface $sourceItemsSaveInterface;
-
+    /**
+     * @var EavSetup
+     */
+    protected EavSetup $eavSetup;
+    /**
+     * @var SourceItemInterfaceFactory
+     */
+    protected SourceItemInterfaceFactory $sourceItemFactory;
+    /**
+     * @var SourceItemsSaveInterface
+     */
+    protected SourceItemsSaveInterface $sourceItemsSaveInterface;
+    /**
+     * @var CategoryLinkManagementInterface
+     */
     protected CategoryLinkManagementInterface $categoryLink;
-
+    /**
+     * @var array
+     */
     protected array $sourceItems = [];
 
+    /**
+     * @param ProductInterfaceFactory $productInterfaceFactory
+     * @param ProductRepositoryInterface $productRepository
+     * @param State $appState
+     * @param EavSetup $eavSetup
+     * @param SourceItemInterfaceFactory $sourceItemFactory
+     * @param SourceItemsSaveInterface $sourceItemsSaveInterface
+     * @param CategoryLinkManagementInterface $categoryLink
+     */
     public function __construct(
-        ProductInterfaceFactory $productInterfaceFactory,
-        ProductRepositoryInterface $productRepository,
-        State $appState,
-        EavSetup $eavSetup,
-		SourceItemInterfaceFactory $sourceItemFactory,
-        SourceItemsSaveInterface $sourceItemsSaveInterface,
+        ProductInterfaceFactory         $productInterfaceFactory,
+        ProductRepositoryInterface      $productRepository,
+        State                           $appState,
+        EavSetup                        $eavSetup,
+        SourceItemInterfaceFactory      $sourceItemFactory,
+        SourceItemsSaveInterface        $sourceItemsSaveInterface,
         CategoryLinkManagementInterface $categoryLink
-    )
-    {
+    ) {
         $this->appState = $appState;
         $this->productInterfaceFactory = $productInterfaceFactory;
         $this->productRepository = $productRepository;
-		$this->eavSetup = $eavSetup;
+        $this->eavSetup = $eavSetup;
         $this->sourceItemFactory = $sourceItemFactory;
         $this->sourceItemsSaveInterface = $sourceItemsSaveInterface;
         $this->categoryLink = $categoryLink;
     }
 
+    /**
+     * @return void
+     * @throws \Exception
+     */
     public function apply(): void
     {
         /* emulating the area on which the execute function will work to adminhtml area */
         $this->appState->emulateAreaCode('adminhtml', [$this, 'execute']);
     }
 
+    /**
+     * @return void
+     * @throws \Magento\Framework\Exception\CouldNotSaveException
+     * @throws \Magento\Framework\Exception\InputException
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\StateException
+     * @throws \Magento\Framework\Validation\ValidationException
+     */
     public function execute(): void
     {
         /* Create the product and make sure its not already created */
@@ -71,7 +110,7 @@ class AddNewProduct implements DataPatchInterface {
         $attributeSetId = $this->eavSetup->getAttributeSetId(Product::ENTITY, 'Default');
 
         /* setting the mandatory attributes */
-		$product->setTypeId(Type::TYPE_SIMPLE)
+        $product->setTypeId(Type::TYPE_SIMPLE)
         ->setName('my new product')
         ->setAttributeSetId($attributeSetId)
         ->setSku('my-new-product')
@@ -87,19 +126,25 @@ class AddNewProduct implements DataPatchInterface {
         $sourceItem->setSku($product->getSku());
         $sourceItem->setStatus(SourceItemInterface::STATUS_IN_STOCK);
         $this->sourceItems[] = $sourceItem;
-    
+
         $this->sourceItemsSaveInterface->execute($this->sourceItems);
         /* linking the product to the default category */
         $this->categoryLink->assignProductToCategories($product->getSku(), [2]);
     }
 
-    public static function getDependencies():array
-        {
-            return [];
-        }
+    /**
+     * @return array|string[]
+     */
+    public static function getDependencies(): array
+    {
+        return [];
+    }
 
-    public function getAliases():array
-        {
-            return [];
-        }
+    /**
+     * @return array|string[]
+     */
+    public function getAliases(): array
+    {
+        return [];
+    }
 }

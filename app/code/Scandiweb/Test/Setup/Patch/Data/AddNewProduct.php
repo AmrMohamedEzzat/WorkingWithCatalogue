@@ -3,6 +3,12 @@
 namespace Scandiweb\Test\Setup\Patch\Data;
 
 /* importing required classes  */
+
+use \Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\StateException;
+use Magento\Framework\Validation\ValidationException;
 use Magento\Catalog\Api\Data\ProductInterfaceFactory;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
@@ -70,7 +76,8 @@ class AddNewProduct implements DataPatchInterface
         SourceItemInterfaceFactory      $sourceItemFactory,
         SourceItemsSaveInterface        $sourceItemsSaveInterface,
         CategoryLinkManagementInterface $categoryLink
-    ) {
+    )
+    {
         $this->appState = $appState;
         $this->productInterfaceFactory = $productInterfaceFactory;
         $this->productRepository = $productRepository;
@@ -111,12 +118,12 @@ class AddNewProduct implements DataPatchInterface
 
         /* setting the mandatory attributes */
         $product->setTypeId(Type::TYPE_SIMPLE)
-        ->setName('my new product')
-        ->setAttributeSetId($attributeSetId)
-        ->setSku('my-new-product')
-        ->setPrice(5)
-        ->setVisibility(Visibility::VISIBILITY_BOTH)
-        ->setStatus(Status::STATUS_ENABLED);
+            ->setName('my new product')
+            ->setAttributeSetId($attributeSetId)
+            ->setSku('my-new-product')
+            ->setPrice(5)
+            ->setVisibility(Visibility::VISIBILITY_BOTH)
+            ->setStatus(Status::STATUS_ENABLED);
         /* saving the product */
         $product = $this->productRepository->save($product);
         /* creating inventory to the product and setting the quantitiy in it */

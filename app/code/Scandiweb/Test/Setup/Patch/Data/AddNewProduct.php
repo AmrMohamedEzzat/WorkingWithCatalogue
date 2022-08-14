@@ -76,8 +76,7 @@ class AddNewProduct implements DataPatchInterface
         SourceItemInterfaceFactory      $sourceItemFactory,
         SourceItemsSaveInterface        $sourceItemsSaveInterface,
         CategoryLinkManagementInterface $categoryLink
-    )
-    {
+    ){
         $this->appState = $appState;
         $this->productInterfaceFactory = $productInterfaceFactory;
         $this->productRepository = $productRepository;
